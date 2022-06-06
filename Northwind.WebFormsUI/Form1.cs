@@ -1,5 +1,6 @@
 ﻿using Business.Abstract;
 using Business.Concrete;
+using Business.DependencyResolvers.Ninject;
 using Northwind.DataAccess.Concrete.EntityFramework;
 using Northwind.Entities.Concrete;
 using System;
@@ -19,8 +20,8 @@ namespace Northwind.WebFormsUI
         public Form1()
         {
             InitializeComponent();
-            _categoryService = new CategoryManager(new EfCategoryDal());
-            _productService = new ProductManager(new EfProductDal());
+            _categoryService = InstanceFactory.GetInstance<ICategoryService>();
+            _productService = InstanceFactory.GetInstance<IProductService>();
         }
         private ICategoryService _categoryService;
         private IProductService _productService;
@@ -74,31 +75,48 @@ namespace Northwind.WebFormsUI
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            _productService.Add(new Product
+            try
             {
-                CategoryId = Convert.ToInt32(cbxKategori.SelectedValue),
-                ProductName = tbxProductName2.Text,
-                QuantityPerUnit = tbxQuantityPerUnit.Text,
-                UnitPrice = Convert.ToDecimal(tbxUnitPrice.Text),
-                UnitsInStock = Convert.ToInt16(tbxStock.Text)
-            });
-            MessageBox.Show("Ürün Eklendi.");
-            LoadProducts();
+                _productService.Add(new Product
+                {
+                    CategoryId = Convert.ToInt32(cbxKategori.SelectedValue),
+                    ProductName = tbxProductName2.Text,
+                    QuantityPerUnit = tbxQuantityPerUnit.Text,
+                    UnitPrice = Convert.ToDecimal(tbxUnitPrice.Text),
+                    UnitsInStock = Convert.ToInt16(tbxStock.Text)
+                });
+                MessageBox.Show("Ürün Eklendi.");
+                LoadProducts();
+
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }      
+          
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            _productService.Update(new Product 
+            try
             {
-             ProductId=Convert.ToInt32(dgwProduct.CurrentRow.Cells[0].Value),
-             ProductName=tbxProductNameUpdate.Text,
-             CategoryId=Convert.ToInt32(cbxCategoryUpdate.SelectedValue),
-             QuantityPerUnit=tbxQuantityPerUnitUpdate.Text,
-             UnitsInStock=Convert.ToInt16(tbxUnitsInStock.Text),
-             UnitPrice=Convert.ToDecimal(tbxUnitPriceUpdate.Text)         
-            });
-            MessageBox.Show("Ürün Güncellendi.");
-            LoadProducts();
+                _productService.Update(new Product
+                {
+                    ProductId = Convert.ToInt32(dgwProduct.CurrentRow.Cells[0].Value),
+                    ProductName = tbxProductNameUpdate.Text,
+                    CategoryId = Convert.ToInt32(cbxCategoryUpdate.SelectedValue),
+                    QuantityPerUnit = tbxQuantityPerUnitUpdate.Text,
+                    UnitsInStock = Convert.ToInt16(tbxUnitsInStock.Text),
+                    UnitPrice = Convert.ToDecimal(tbxUnitPriceUpdate.Text)
+                });
+                MessageBox.Show("Ürün Güncellendi.");
+                LoadProducts();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
 
         private void dgwProduct_CellClick(object sender, DataGridViewCellEventArgs e)

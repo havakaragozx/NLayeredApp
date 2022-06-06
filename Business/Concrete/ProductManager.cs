@@ -1,4 +1,7 @@
 ﻿using Business.Abstract;
+using Business.Utilities;
+using Business.ValidationRules.FluentValidation;
+using FluentValidation;
 using Northwind.DataAccess.Abstract;
 using Northwind.DataAccess.Concrete;
 using Northwind.DataAccess.Concrete.EntityFramework;
@@ -22,11 +25,12 @@ namespace Business.Concrete
 
         public void Add(Product product)
         {
+            ValidationTool.Validate(new ProductValidator(),product);
             _productDal.Add(product);
         }
 
         public void Delete(Product product)
-        {          
+        {           
             _productDal.Delete(product);
                   
         }
@@ -48,6 +52,7 @@ namespace Business.Concrete
 
         public void Update(Product product)
         {
+            ValidationTool.Validate(new ProductValidator(), product);
             _productDal.Update(product);
         }
     }
